@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDIT FILE</title>
+</head>
+<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
+<body class="w-full bg-blue-400 ">
+    
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-8 m-5">
+        <div class="border flex justify-center items-center p-4 col-span-1 lg:col-span-2">
+                   
+    <div class=" w-full px-5  bg-white rounded shadow-2xl pb-5">
+        <div class="infoBot my-5 ">   
+
+        </div>
+ 
+
+                <div class="">
+                    
+            <h1 class="block w-full text-center text-gray-800 text-2xl font-bold mb-6">BOT SETTING</h1>
+
+            <div class="infoServer">
+    
+            </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="target">Target</label>
+                    <textarea class="border py-2 px-3 text-grey-800" type="text" id="target" rows="5" ></textarea>
+                </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="komen">Komen</label>
+                    <textarea class="border py-2 px-3 text-grey-800" type="text" id="komen" rows="5"></textarea>
+                </div>
+                <div class="flex flex-col mb-4 md:flex md:justify-center">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="filter">Filter</label>
+                    <textarea class="border py-2 px-3 text-grey-800" type="text" id="filter" rows="5"></textarea>
+                </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="targetKhusus">Target Khusus</label>
+                    <textarea class="border py-2 px-3 text-grey-800" type="text" id="targetKhusus" rows="5"></textarea>
+                </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="komenKhusus">Komen Khusus</label>
+                    <textarea class="border py-2 px-3 text-grey-800" type="text" id="komenKhusus" rows="5"></textarea>
+                </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="delay">Delay</label>
+                    <input class="border py-2 px-3 text-grey-800" type="text" id="delay" rows="5"></input>
+                </div>
+                <div class="flex flex-col md:flex md:justify-center mb-4">
+                    <label class="mb-2 font-bold text-lg text-gray-900" for="limit">Limit</label>
+                    <input class="border py-2 px-3 text-grey-800" type="text" id="limit"></input>
+                    <p class="text-sm">Jika limit = 0 Maka bot nonaktif.</p>
+                </div>
+
+                <button class="block bg-black hover:bg-red-600 text-white uppercase text-lg mx-auto p-4	rounded" id="update">Update</button>
+    
+                <div id="info">
+
+                </div>
+                </div>
+    </div>
+        </div>
+        <div class="border p-4 ">
+            <div class="w-full  bg-white rounded shadow-2xl pb-5 h-full">
+                <div class=" w-full px-5 ">
+
+                <h1 class="block  text-center text-gray-800 text-2xl font-bold mb-6">LOG</h1>
+                <div class=" border border-green-500   ">
+                    <div id="logger">
+
+                    </div>
+                </div>
+
+            </div>
+            </div>
+
+
+
+
+            </div>
+        </div>
+      </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" crossorigin="anonymous"></script>
+<script>
+    $("#log").each(function () {
+  this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+}).on("input", function () {
+  this.style.height = "auto";
+  this.style.height = (this.scrollHeight) + "px";
+});
+    $(document).ready(function() {
+        var socket = io();
+
+        socket.on('message', function(msg) {
+
+            if(msg == "connecting"){
+            $( ".infoServer" ).append( "<span class=' no-underline mt-4 text-sm text-blue-400 font-bold'>Connecting to server...</span>" );
+            }
+            else if(msg == "connected"){
+                $( ".infoServer" ).attr("class", "infoServer text-center no-underline mt-4 text-sm text-green-700 font-bold" );
+                $( ".infoServer" ).html('Connected !');
+            }else if(msg == "updated"){
+                $( "#info" ).attr("class", "text-center no-underline mt-4 text-sm text-green-700 font-bold" );
+                $( "#info" ).html('Updated !');
+                setTimeout(function(){
+                    $( "#info" ).html('');
+                },3000);
+            }
+        
+        });
+        socket.on('logger',function(isi){
+            $('#logger').append('<p class="text-purple-500" style="white-space: pre-wrap;">'+isi+'</p>');
+        });
+        socket.on('status',function(isi){
+            if(isi == 0)
+            {
+                $('.infoBot').html("<span class='text-black font-bold text-center bg-red-500 block'>BOT NOT ACTIVE</span>");
+            }else{
+                
+                $('.infoBot').html("<span class='text-white text-center font-bold bg-green-300 block'>BOT ACTIVE</span>");
+
+            }
+
+        });
+        socket.on('target',function(isi){
+            $('#target').val(isi);
+        });
+        
+        socket.on('komen',function(isi){
+            $('#komen').val(isi);
+        });
+        socket.on('filter',function(isi){
+            $('#filter').val(isi);
+        });
+        socket.on('targetKhusus',function(isi){
+            $('#targetKhusus').val(isi);
+        });
+        socket.on('komenKhusus',function(isi){
+            $('#komenKhusus').val(isi);
+        });
+        socket.on('delay',function(isi){
+            $('#delay').val(isi);
+        });
+        socket.on('limit',function(isi){
+            $('#limit').val(isi);
+        });
+  
+        $("#update").click(function(){
+
+            var data = {
+                target: $('#target').val(),
+                komen: $('#komen').val(),
+                filter: $('#filter').val(),
+                targetKhusus: $('#targetKhusus').val(),
+                komenKhusus: $('#komenKhusus').val(),
+                delay: $('#delay').val(),
+                limit: $('#limit').val(),
+            }
+
+            socket.emit('update',data);
+            });
+    });
+    setInterval(function(){
+        socket.emit('refresh',true);
+    },3000);
+</script>
+</html>
